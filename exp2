@@ -1,0 +1,77 @@
+import logo from './logo.svg';
+import './App.css';
+
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function App() {
+  const [token, setToken] = useState('');
+  const [trainDetails, setTrainDetails] = useState([]);
+  const [specificTrainDetails, setSpecificTrainDetails] = useState({});
+
+  useEffect(() => {
+    // Replace 'YOUR_ACCESS_TOKEN' with the actual token
+    setToken('YOUR_ACCESS_TOKEN');
+  }, []);
+
+  const fetchTrainDetails = async () => {
+    const trainDetailsUrl = 'http://20.244.56.144/train/trains';
+
+    const headers = {
+      'Authorization': `Bearer ${token}`
+    };
+
+    try {
+      const response = await axios.get(trainDetailsUrl, { headers });
+      setTrainDetails(response.data);
+    } catch (error) {
+      console.error('Error fetching train details:', error);
+    }
+  };
+
+  const fetchSpecificTrainDetails = async (trainNumber) => {
+    const specificTrainUrl = `http://20.244.56.144/train/trains/${trainNumber}`;
+
+    const headers = {
+      'Authorization': `Bearer ${token}`
+    };
+
+    try {
+      const response = await axios.get(specificTrainUrl, { headers });
+      setSpecificTrainDetails(response.data);
+    } catch (error) {
+      console.error('Error fetching specific train details:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTrainDetails();
+  }, [token]);
+
+  return (
+    <div className="App">
+      <h1>Train Details</h1>
+      <ul>
+        {trainDetails.map(train => (
+          <li key={train.trainNumber}>
+            <strong>Train Name:</strong> {train.trainName}<br />
+            <strong>Train Number:</strong> {train.trainNumber}<br />
+            <button onClick={() => fetchSpecificTrainDetails(train.trainNumber)}>
+              Fetch Details
+            </button>
+          </li>
+        ))}
+      </ul>
+      {specificTrainDetails.trainName && (
+        <div>
+          <h2>Specific Train Details</h2>
+          <p><strong>Train Name:</strong> {specificTrainDetails.trainName}</p>
+          <p><strong>Train Number:</strong> {specificTrainDetails.trainNumber}</p>
+          {/* Display more details here */}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
