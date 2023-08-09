@@ -1,0 +1,89 @@
+import logo from './logo.svg';
+import './App.css';
+
+import React, { useState } from 'react';
+import axios from 'axios';
+
+function App() {
+  const [registrationResponse, setRegistrationResponse] = useState({});
+  const [authorizationResponse, setAuthorizationResponse] = useState({});
+  const [trainDetails, setTrainDetails] = useState([]);
+
+  const handleRegister = async () => {
+    const registrationUrl = 'http://20.244.56.144/train/register';
+    const registrationData = {
+      companyName: 'Train Central',
+      ownerName: 'Ram',
+      rollNo: '1',
+      ownerEmail: 'ram@abc.edu',
+      accessCode: 'FKDLjg'
+    };
+
+    try {
+      const response = await axios.post(registrationUrl, registrationData);
+      setRegistrationResponse(response.data);
+    } catch (error) {
+      console.error('Registration error:', error);
+    }
+  };
+
+  const handleAuthorize = async () => {
+    const authorizationUrl = 'http://20.244.56.144/train/authorize';
+    const authorizationData = {
+      companyName: 'Train Central',
+      clientID: 'b46128a0-fbde-4c16-a4b1-6ae6ad718e27',
+      ownerName: 'Ram',
+      ownerEmail: 'ram@abc.edu',
+      rollNo: '1',
+      clientSecret: 'XOyolORPayKBODAN'
+    };
+
+    try {
+      const response = await axios.post(authorizationUrl, authorizationData);
+      setAuthorizationResponse(response.data);
+    } catch (error) {
+      console.error('Authorization error:', error);
+    }
+  };
+
+  const handleGetTrainDetails = async () => {
+    const token = 'YOUR_ACCESS_TOKEN'; // Replace with the actual token
+    const trainDetailsUrl = 'http://20.244.56.144/train/trains';
+
+    const headers = {
+      'Authorization': `Bearer ${token}`
+    };
+
+    try {
+      const response = await axios.get(trainDetailsUrl, { headers });
+      setTrainDetails(response.data);
+    } catch (error) {
+      console.error('Get train details error:', error);
+    }
+  };
+
+  return (
+    <div className="App">
+      <button onClick={handleRegister}>Register</button>
+      <button onClick={handleAuthorize}>Authorize</button>
+      <button onClick={handleGetTrainDetails}>Get Train Details</button>
+
+      <div>
+        <h2>Registration Response</h2>
+        <pre>{JSON.stringify(registrationResponse, null, 2)}</pre>
+      </div>
+
+      <div>
+        <h2>Authorization Response</h2>
+        <pre>{JSON.stringify(authorizationResponse, null, 2)}</pre>
+      </div>
+
+      <div>
+        <h2>Train Details</h2>
+        <pre>{JSON.stringify(trainDetails, null, 2)}</pre>
+      </div>
+    </div>
+  );
+}
+
+export default App;
